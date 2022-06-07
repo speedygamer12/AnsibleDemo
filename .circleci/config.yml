@@ -22,52 +22,52 @@ jobs:
                 --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
                 --region us-east-1
 
-        - run:
-            name: Wait for ec2 to run
-            command: sleep 2m
-        - run:
-            name: Add Created Infrastructure to Playbook Inventory
-            command: |
-              aws --region us-east-1 \
-                ec2 describe-instances \
-                --filters \
-                "Name=instance-state-name,Values=running" \
-                "Name=tag:Project,Values=udacity" \
-                --query 'Reservations[*].Instances[*].[PublicIpAddress]' \
-                --output text >> inventory.txt
+  #       - run:
+  #           name: Wait for ec2 to run
+  #           command: sleep 2m
+  #       - run:
+  #           name: Add Created Infrastructure to Playbook Inventory
+  #           command: |
+  #             aws --region us-east-1 \
+  #               ec2 describe-instances \
+  #               --filters \
+  #               "Name=instance-state-name,Values=running" \
+  #               "Name=tag:Project,Values=udacity" \
+  #               --query 'Reservations[*].Instances[*].[PublicIpAddress]' \
+  #               --output text >> inventory.txt
   
-  configure_infrastructure: 
-    docker:
-      - image: python:3.7-alpine3.11
-    steps:
-      - checkout
-      - add_ssh_keys:
-              fingerprints: ["ce:f2:a1:cd:69:63:53:50:c8:1c:9b:b2:46:a7:51:1e"] 
-      - run:
-          name: Install Ansible
-          command: |
-            apk add --update ansible
-      - run:
-          name: Run Playbook and Configure server
-          command: |
-            ansible-playbook -i inventory.txt main.yml
+  # configure_infrastructure: 
+  #   docker:
+  #     - image: python:3.7-alpine3.11
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #             fingerprints: ["ce:f2:a1:cd:69:63:53:50:c8:1c:9b:b2:46:a7:51:1e"] 
+  #     - run:
+  #         name: Install Ansible
+  #         command: |
+  #           apk add --update ansible
+  #     - run:
+  #         name: Run Playbook and Configure server
+  #         command: |
+  #           ansible-playbook -i inventory.txt main.yml
 
-  smoke_test:
-    docker:
-      - image: alpine:latest
-    steps:
-      - run: apk add --update curl
-      - run:
-          name: smoke test
-          command: |
-            URL="https://blog.udacity.com/"
-            # Test if website exists
-            if curl -s --head ${URL} 
-            then
-              return 0
-            else
-              return 1
-            fi
+  # smoke_test:
+  #   docker:
+  #     - image: alpine:latest
+  #   steps:
+  #     - run: apk add --update curl
+  #     - run:
+  #         name: smoke test
+  #         command: |
+  #           URL="https://blog.udacity.com/"
+  #           # Test if website exists
+  #           if curl -s --head ${URL} 
+  #           then
+  #             return 0
+  #           else
+  #             return 1
+  #           fi
 
   smoke_test:
     docker:
