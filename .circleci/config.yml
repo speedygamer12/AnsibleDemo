@@ -1,28 +1,28 @@
 version: 2.1
 commands:
-  destroy_environment:
-    steps:
-      - run:
-          name: Destroy environment
-          when: on_fail
-          command: |
-            aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7}
+  # destroy_environment:
+  #   steps:
+  #     - run:
+  #         name: Destroy environment
+  #         when: on_fail
+  #         command: |
+  #           aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7}
 
-jobs:
-  create_infrastructure: 
-      docker:
-        - image: amazon/aws-cli
-      steps:
-        - checkout
-        - run:
-            name: Create Cloudformation Stack
-            command: |
-              aws cloudformation deploy \
-                --template-file template.yml \
-                --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
-                --region us-east-1
-        - run: return 1
-      - destroy_environment
+# jobs:
+#   create_infrastructure: 
+#       docker:
+#         - image: amazon/aws-cli
+#       steps:
+#         - checkout
+#         - run:
+#             name: Create Cloudformation Stack
+#             command: |
+#               aws cloudformation deploy \
+#                 --template-file template.yml \
+#                 --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
+#                 --region us-east-1
+#         - run: return 1
+#       - destroy_environment
 
   #       - run:
   #           name: Wait for ec2 to run
@@ -38,21 +38,21 @@ jobs:
   #               --query 'Reservations[*].Instances[*].[PublicIpAddress]' \
   #               --output text >> inventory.txt
   
-  # configure_infrastructure: 
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #             fingerprints: ["ce:f2:a1:cd:69:63:53:50:c8:1c:9b:b2:46:a7:51:1e"] 
-  #     - run:
-  #         name: Install Ansible
-  #         command: |
-  #           apk add --update ansible
-  #     - run:
-  #         name: Run Playbook and Configure server
-  #         command: |
-  #           ansible-playbook -i inventory.txt main.yml
+  configure_infrastructure: 
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+              fingerprints: ["ce:f2:a1:cd:69:63:53:50:c8:1c:9b:b2:46:a7:51:1e"] 
+      - run:
+          name: Install Ansible
+          command: |
+            apk add --update ansible
+      - run:
+          name: Run Playbook and Configure server
+          command: |
+            ansible-playbook -i inventory.txt main.yml
 
   # smoke_test:
   #   docker:
