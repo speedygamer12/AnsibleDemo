@@ -10,19 +10,19 @@ commands:
 
 jobs:
   create_infrastructure: 
-      docker:
-        - image: amazon/aws-cli
-      steps:
-        - checkout
-        - run:
-            name: Create Cloudformation Stack
-            command: |
-              aws cloudformation deploy \
-                --template-file template.yml \
-                --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
-                --region us-east-1
-        - run: return 1
-      - destroy_environment
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Create Cloudformation Stack
+          command: |
+            aws cloudformation deploy \
+              --template-file template.yml \
+              --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
+              --region us-east-1
+      - run: return 1
+    - destroy_environment
 
   #       - run:
   #           name: Wait for ec2 to run
@@ -54,22 +54,22 @@ jobs:
   #         command: |
   #           ansible-playbook -i inventory.txt main.yml
 
-  smoke_test:
-    docker:
-      - image: alpine:latest
-    steps:
-      - run: apk add --update curl
-      - run:
-          name: smoke test
-          command: |
-            URL="https://blog.udacity123.com/"
-            # Test if website exists
-            if curl -s --head ${URL} 
-            then
-              return 0
-            else
-              return 1
-            fi
+  # smoke_test:
+  #   docker:
+  #     - image: alpine:latest
+  #   steps:
+  #     - run: apk add --update curl
+  #     - run:
+  #         name: smoke test
+  #         command: |
+  #           URL="https://blog.udacity123.com/"
+  #           # Test if website exists
+  #           if curl -s --head ${URL} 
+  #           then
+  #             return 0
+  #           else
+  #             return 1
+  #           fi
 
   # smoke_test:
   #   docker:
